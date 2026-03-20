@@ -23,3 +23,9 @@ response_type usually is `code` which is a code being returned in case of succes
 ## Resource Server
 
 Your APIs
+
+## OAuth vs OpenID Connect
+
+OAuth issues access tokens to your app, opendID Connect issues id tokens to your app. 
+
+OpenID Connect is a extension to OAuth.
