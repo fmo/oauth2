@@ -19,3 +19,7 @@ response_type usually is `code` which is a code being returned in case of succes
     * Exchanges them for tokens
     * Validate clients
     * Returns access/id/refresh tokens
+
+## Resource Server
+
+Your APIs
