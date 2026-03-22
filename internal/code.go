@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"crypto/rand"
@@ -7,16 +7,9 @@ import (
 	"time"
 )
 
-type AuthCode struct {
-	UserID      string
-	ClientID    string
-	RedirectURI string
-	ExpiresAt   time.Time
-}
-
 var codeStore = map[string]AuthCode{}
 
-func generateCode() (string, error) {
+func GenerateCode() (string, error) {
 	b := make([]byte, 32) // 256-bit
 
 	_, err := rand.Read(b)
@@ -30,7 +23,7 @@ func generateCode() (string, error) {
 	return code, nil
 }
 
-func storeCode(code, userID, clientID, redirectURI string) {
+func StoreCode(code, userID, clientID, redirectURI string) {
 	codeStore[code] = AuthCode{
 		UserID:      userID,
 		ClientID:    clientID,

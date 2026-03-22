@@ -1,19 +1,17 @@
-package main
+package handlers
 
 import (
 	"net/http"
 )
 
-func TokenHandler(w http.ResponseWriter, r *http.Request) {
+func (a *App) Token(w http.ResponseWriter, r *http.Request) {
 	clientID := r.FormValue("client_id")
 	clientSecret := r.FormValue("client_secret")
 
-	clients := getClients()
-
 	grantType := r.FormValue("grant_type")
 
-	if v, ok := clients[clientID]; ok {
-		if v.Secret != clientSecret {
+	if client, ok := a.Clients[clientID]; ok {
+		if client.Secret != clientSecret {
 			http.Error(w, "not matching secret", http.StatusUnauthorized)
 			return
 		}
