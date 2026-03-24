@@ -36,7 +36,7 @@ func (a *App) Authorize(w http.ResponseWriter, r *http.Request) {
 	}
 
 	code, _ := internal.GenerateCode()
-	internal.StoreCode(code, userID, clientID, redirectURI, scope)
+	a.StoreCode(code, userID, clientID, redirectURI, scope)
 
 	redirect := redirectURI + "?code=" + code
 	http.Redirect(w, r, redirect, http.StatusFound)
