@@ -1,8 +1,18 @@
 package handlers
 
-import "net/http"
+import (
+	"net/http"
+	"text/template"
+)
 
 func (a *App) Login(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		template, _ := template.ParseFiles("templates/login.html")
+
+		template.Execute(w, nil)
+		return
+	}
+
 	sessionID, err := newSessionID()
 	if err != nil {
 		http.Error(w, "could not create session", http.StatusInternalServerError)
