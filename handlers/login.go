@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"text/template"
 )
@@ -11,6 +12,13 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 
 		template.Execute(w, nil)
 		return
+	}
+
+	if r.Method == "POST" {
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+
+		fmt.Println(username, password)
 	}
 
 	sessionID, err := newSessionID()
