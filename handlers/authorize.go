@@ -31,7 +31,9 @@ func (a *App) Authorize(w http.ResponseWriter, r *http.Request) {
 	// get user
 	userID, err := a.getUserFromRequest(r)
 	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
+		login := fmt.Sprintf("login?response_type=%s&redirect_uri=%s", responseType, redirectURI)
+
+		http.Redirect(w, r, login, http.StatusFound)
 		return
 	}
 

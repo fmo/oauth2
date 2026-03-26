@@ -1,12 +1,15 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"text/template"
 )
 
 func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
+		log.Println(r.URL.Query().Get("response_type"))
+
 		template, _ := template.ParseFiles("templates/login.html")
 
 		template.Execute(w, nil)
@@ -44,7 +47,7 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 		Value:    sessionID,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false,
 		SameSite: http.SameSiteLaxMode,
 	})
 }
