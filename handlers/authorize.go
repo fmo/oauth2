@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/fmo/oauth/internal"
 )
@@ -31,9 +32,16 @@ func (a *App) Authorize(w http.ResponseWriter, r *http.Request) {
 	// get user
 	userID, err := a.getUserFromRequest(r)
 	if err != nil {
-		login := fmt.Sprintf("/login?response_type=%s&redirect_uri=%s&client_id=%s&scope=%s", responseType, redirectURI, clientID, scope)
+		u, _ := url.Parse("/login")
+		q := u.Query()
+		q.Set("client_id", clientID)
+		q.Set("response_type", responseType)
+		q.Set("redirect_uri", redirectURI)
+		q.Set("scope", scope)
 
-		http.Redirect(w, r, login, http.StatusFound)
+		u.RawQuery = q.Encode()
+
+		http.Redirect(w, r, u.String(), http.StatusFound)
 		return
 	}
 
