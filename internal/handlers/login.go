@@ -12,9 +12,10 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 	redirectURI := r.URL.Query().Get("redirect_uri")
 	clientID := r.URL.Query().Get("client_id")
 	scope := r.URL.Query().Get("scope")
+	state := r.URL.Query().Get("state")
 
 	if r.Method == "GET" {
-		loginURI := internal.CreateURI("/login", clientID, responseType, redirectURI, scope)
+		loginURI := internal.CreateURI("/login", clientID, responseType, redirectURI, scope, state)
 
 		template, _ := template.ParseFiles("templates/login.html")
 
@@ -62,7 +63,7 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	l := internal.CreateURI("/oauth/authorize", clientID, responseType, redirectURI, scope)
+	l := internal.CreateURI("/oauth/authorize", clientID, responseType, redirectURI, scope, state)
 
 	http.Redirect(w, r, l, http.StatusFound)
 }

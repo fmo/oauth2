@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"net/url"
 
 	"github.com/fmo/oauth/internal"
 )
@@ -11,6 +12,7 @@ func (a *App) Authorize(w http.ResponseWriter, r *http.Request) {
 	redirectURI := r.URL.Query().Get("redirect_uri")
 	responseType := r.URL.Query().Get("response_type")
 	scope := r.URL.Query().Get("scope")
+	state := r.URL.Query().Get("state")
 
 	if _, ok := a.Clients[clientID]; !ok {
 		http.Error(w, "client is not defined", http.StatusBadRequest)
@@ -30,7 +32,7 @@ func (a *App) Authorize(w http.ResponseWriter, r *http.Request) {
 	// get user
 	userID, err := internal.GetUserFromRequest(r, a.Sessions)
 	if err != nil {
-		loginURI := internal.CreateURI("/login", clientID, responseType, redirectURI, scope)
+		loginURI := internal.CreateURI("/login", clientID, responseType, redirectURI, scope, state)
 		http.Redirect(w, r, loginURI, http.StatusFound)
 		return
 	}
@@ -38,6 +40,12 @@ func (a *App) Authorize(w http.ResponseWriter, r *http.Request) {
 	code, _ := internal.GenerateCode()
 	a.StoreCode(code, userID, clientID, redirectURI, scope)
 
-	redirect := redirectURI + "?code=" + code
-	http.Redirect(w, r, redirect, http.StatusFound)
+	u, _ := url.Parse(redirectURI)
+	q := u.Query()
+	q.Add("code", code)
+	q.Add("state", state)
+
+	u.RawQuery = q.Encode()
+
+	http.Redirect(w, r, u.String(), http.StatusFound)
 }
