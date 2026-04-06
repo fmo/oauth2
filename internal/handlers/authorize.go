@@ -3,8 +3,6 @@ package handlers
 import (
 	"net/http"
 	"net/url"
-
-	"github.com/fmo/oauth/internal"
 )
 
 func (a *App) Authorize(w http.ResponseWriter, r *http.Request) {
@@ -30,14 +28,18 @@ func (a *App) Authorize(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get user
-	userID, err := internal.GetUserFromRequest(r, a.Sessions)
+	userID, err := GetUserFromRequest(r, a.Sessions)
 	if err != nil {
-		loginURI := internal.CreateURI("/login", clientID, responseType, redirectURI, scope, state)
+		loginURI := CreateURI("/login", clientID, responseType, redirectURI, scope, state)
 		http.Redirect(w, r, loginURI, http.StatusFound)
 		return
 	}
 
-	code, _ := internal.GenerateCode()
+	code, err := a.GenerateCode()
+	if err != nil {
+		http.Error(w, "cant generate code", http.StatusInternalServerError)
+		return
+	}
 	a.StoreCode(code, userID, clientID, redirectURI, scope)
 
 	u, _ := url.Parse(redirectURI)

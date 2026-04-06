@@ -1,22 +1,36 @@
 package handlers
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"time"
-
-	"github.com/fmo/oauth/internal"
 )
 
 type App struct {
 	Sessions map[string]string
 	Clients  map[string]Client
-	Codes    map[string]internal.AuthCode
+	Codes    map[string]AuthCode
 	Users    map[string]string
 }
 
 type Client struct {
 	Secret      string
 	RedirectURI string
+}
+
+type AuthCode struct {
+	UserID      string
+	ClientID    string
+	RedirectURI string
+	ExpiresAt   time.Time
+	Scope       string
+}
+
+type Consent struct {
+	UserID   string
+	ClientID string
+	Scope    string
 }
 
 func NewApp() *App {
@@ -34,13 +48,27 @@ func NewApp() *App {
 	return &App{
 		Sessions: make(map[string]string),
 		Clients:  clients,
-		Codes:    make(map[string]internal.AuthCode),
+		Codes:    make(map[string]AuthCode),
 		Users:    users,
 	}
 }
 
+func (a *App) GenerateCode() (string, error) {
+	b := make([]byte, 32) // 256-bit
+
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+
+	// URL-safe (no + / =)
+	code := base64.RawURLEncoding.EncodeToString(b)
+
+	return code, nil
+}
+
 func (a *App) StoreCode(code, userID, clientID, redirectURI, scope string) {
-	a.Codes[code] = internal.AuthCode{
+	a.Codes[code] = AuthCode{
 		UserID:      userID,
 		ClientID:    clientID,
 		RedirectURI: redirectURI,
@@ -49,7 +77,7 @@ func (a *App) StoreCode(code, userID, clientID, redirectURI, scope string) {
 	}
 }
 
-func (a *App) ConsumeCode(code, clientID, redirectURI string) (*internal.AuthCode, error) {
+func (a *App) ConsumeCode(code, clientID, redirectURI string) (*AuthCode, error) {
 	data, ok := a.Codes[code]
 	if !ok {
 		return nil, fmt.Errorf("invalid code")

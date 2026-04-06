@@ -3,8 +3,6 @@ package handlers
 import (
 	"net/http"
 	"text/template"
-
-	"github.com/fmo/oauth/internal"
 )
 
 func (a *App) Login(w http.ResponseWriter, r *http.Request) {
@@ -15,7 +13,7 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 	state := r.URL.Query().Get("state")
 
 	if r.Method == "GET" {
-		loginURI := internal.CreateURI("/login", clientID, responseType, redirectURI, scope, state)
+		loginURI := CreateURI("/login", clientID, responseType, redirectURI, scope, state)
 
 		template, _ := template.ParseFiles("templates/login.html")
 
@@ -63,7 +61,7 @@ func (a *App) Login(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	l := internal.CreateURI("/oauth/authorize", clientID, responseType, redirectURI, scope, state)
+	l := CreateURI("/oauth/authorize", clientID, responseType, redirectURI, scope, state)
 
 	http.Redirect(w, r, l, http.StatusFound)
 }
