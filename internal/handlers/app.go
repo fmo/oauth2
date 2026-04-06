@@ -9,9 +9,14 @@ import (
 
 type App struct {
 	Sessions map[string]string
-	Clients  map[string]internal.Client
+	Clients  map[string]Client
 	Codes    map[string]internal.AuthCode
 	Users    map[string]string
+}
+
+type Client struct {
+	Secret      string
+	RedirectURI string
 }
 
 func NewApp() *App {
@@ -19,9 +24,16 @@ func NewApp() *App {
 		"fmo": "123123",
 	}
 
+	clients := map[string]Client{
+		"web_client": Client{
+			Secret:      "axaa",
+			RedirectURI: "http://localhost:8081/callback",
+		},
+	}
+
 	return &App{
 		Sessions: make(map[string]string),
-		Clients:  internal.GetClients(),
+		Clients:  clients,
 		Codes:    make(map[string]internal.AuthCode),
 		Users:    users,
 	}
