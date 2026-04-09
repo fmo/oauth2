@@ -7,10 +7,10 @@
 </head>
 <body>
     <h1>Consent Page</h1>
-    <form action="" method="post">
+    <form action="{{.FormAction}}" method="post">
 
     <label for="scopes">Scopes</label>
-    <input id="scopes" name="scopes" type="text" value="{{.}}">
+    <input id="scopes" name="scopes" type="text" value="{{.Scopes}}">
 
     <button type="submit">Giving Consent</button>
   </form>
