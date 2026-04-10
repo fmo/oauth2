@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"text/template"
 )
@@ -26,7 +25,11 @@ func (a *App) Consent(w http.ResponseWriter, r *http.Request) {
 				ClientID: clientID,
 				Scope:    scope,
 			}
-			fmt.Println(a)
+
+			authorizeURI := CreateURI("/oauth/authorize", clientID, responseType, redirectURI, scope, state)
+
+			http.Redirect(w, r, authorizeURI, http.StatusFound)
+			return
 		}
 
 	}
