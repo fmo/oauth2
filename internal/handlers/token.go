@@ -8,6 +8,16 @@ func (a *App) Token(w http.ResponseWriter, r *http.Request) {
 	clientID := r.FormValue("client_id")
 	clientSecret := r.FormValue("client_secret")
 
+	if _, ok := a.Clients[clientID]; !ok {
+		http.Error(w, "client does not exist", http.StatusBadRequest)
+		return
+	}
+
+	if a.Clients[clientID].Secret != clientSecret {
+		http.Error(w, "wrong client secret", http.StatusUnauthorized)
+		return
+	}
+
 	grantType := r.FormValue("grant_type")
 
 	if client, ok := a.Clients[clientID]; ok {
