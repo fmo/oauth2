@@ -7,25 +7,22 @@ import (
 func (a *App) Token(w http.ResponseWriter, r *http.Request) {
 	clientID := r.FormValue("client_id")
 	clientSecret := r.FormValue("client_secret")
+	redirectURI := r.FormValue("redirect_uri")
+	code := r.FormValue("code")
 
 	if _, ok := a.Clients[clientID]; !ok {
 		http.Error(w, "client does not exist", http.StatusBadRequest)
 		return
 	}
 
-	if a.Clients[clientID].Secret != clientSecret {
+	client := a.Clients[clientID]
+
+	if client.Secret != clientSecret {
 		http.Error(w, "wrong client secret", http.StatusUnauthorized)
 		return
 	}
 
 	grantType := r.FormValue("grant_type")
-
-	if client, ok := a.Clients[clientID]; ok {
-		if client.Secret != clientSecret {
-			http.Error(w, "not matching secret", http.StatusUnauthorized)
-			return
-		}
-	}
 
 	switch grantType {
 	case "client_credentials":
@@ -35,6 +32,12 @@ func (a *App) Token(w http.ResponseWriter, r *http.Request) {
 			"expires_in": 3600
 		}`))
 	case "authorization_code":
+		_, err := a.ConsumeCode(code, clientID, redirectURI)
+		if err != nil {
+			http.Error(w, "code is wrong", http.StatusUnauthorized)
+			return
+		}
+
 		isOIDC := true
 
 		if isOIDC {
