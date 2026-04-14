@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
+	"strings"
 )
 
 func (a *App) Token(w http.ResponseWriter, r *http.Request) {
@@ -46,15 +48,25 @@ func (a *App) Token(w http.ResponseWriter, r *http.Request) {
 
 		a.StoreToken(token, authCode.UserID, authCode.ClientID, authCode.Scope)
 
-		isOIDC := true
+		var isOIDC bool
+		scopes := strings.Fields(authCode.Scope)
+		for _, scope := range scopes {
+			if scope == "openid" {
+				isOIDC = true
+			}
+		}
 
 		if isOIDC {
-			w.Write([]byte(`{
-				"access_token": "abc123",
-				"id_token": "fake-jwt-token",
-				"token_type": "Bearer",
-				"expires_in": 3600
-			}`))
+			resp := map[string]any{
+				"access_token": token,
+				"id_token":     "blabla",
+				"token_type":   "Bearer",
+				"expires_in":   3600,
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(resp)
+
 			return
 		}
 
