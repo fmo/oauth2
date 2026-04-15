@@ -56,26 +56,18 @@ func (a *App) Token(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		if isOIDC {
-			resp := map[string]any{
-				"access_token": token,
-				"id_token":     "blabla",
-				"token_type":   "Bearer",
-				"expires_in":   3600,
-			}
-
-			w.Header().Set("Content-Type", "application/json")
-			_ = json.NewEncoder(w).Encode(resp)
-
-			return
+		resp := map[string]any{
+			"access_token": token,
+			"token_type":   "Bearer",
+			"expires_in":   3600,
 		}
 
-		w.Write([]byte(`{
-			"access_token": "abc123",
-			"token_type": "Bearer",
-			"expires_in": 3600
-		}`))
-		return
+		if isOIDC {
+			resp["id_token"] = "bla bla"
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
 	case "refresh_token":
 	default:
 		http.Error(w, "unsupported grant", http.StatusBadRequest)
