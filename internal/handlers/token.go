@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 
@@ -14,7 +15,11 @@ func (a *App) Token(w http.ResponseWriter, r *http.Request) {
 	redirectURI := r.FormValue("redirect_uri")
 	code := r.FormValue("code")
 
+	log.Println("[DEBUG] /token request - client_id:", clientID)
+	log.Println("[DEBUG] /token request - redirect_uri", redirectURI)
+
 	if _, ok := a.Clients[clientID]; !ok {
+		log.Println("[DEBUG] /token request - client id does not exist")
 		http.Error(w, "client does not exist", http.StatusBadRequest)
 		return
 	}
@@ -22,6 +27,7 @@ func (a *App) Token(w http.ResponseWriter, r *http.Request) {
 	client := a.Clients[clientID]
 
 	if client.Secret != clientSecret {
+		log.Println("[DEBUG] /token request - wrong client secret")
 		http.Error(w, "wrong client secret", http.StatusUnauthorized)
 		return
 	}
