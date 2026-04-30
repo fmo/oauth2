@@ -1,11 +1,16 @@
 package handlers
 
 import (
+	"log/slog"
 	"net/http"
 	"text/template"
 )
 
-func (a *App) Login(w http.ResponseWriter, r *http.Request) {
+func (a *App) Signin(w http.ResponseWriter, r *http.Request) {
+	slog.Info("")
+	slog.Info("===== Signin Handler =====")
+
+	slog.Info("Getting uri params")
 	responseType := r.URL.Query().Get("response_type")
 	redirectURI := r.URL.Query().Get("redirect_uri")
 	clientID := r.URL.Query().Get("client_id")
