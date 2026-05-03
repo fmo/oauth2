@@ -7,7 +7,7 @@ import (
 )
 
 func (a *App) Authorize(w http.ResponseWriter, r *http.Request) {
-	slog.Info("===== Authorize Handler =====")
+	a.Logger.Info("===== Authorize Handler =====")
 
 	slog.Info("Getting uri parameters")
 	clientID := r.URL.Query().Get("client_id")
@@ -20,7 +20,7 @@ func (a *App) Authorize(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "client is not defined", http.StatusBadRequest)
 		return
 	}
-	slog.Info("Client id found")
+	a.Logger.Info("Client id found")
 
 	if a.Clients[clientID].RedirectURI != redirectURI {
 		http.Error(w, "redirect url is not matching", http.StatusBadRequest)
